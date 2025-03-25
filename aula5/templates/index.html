@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processamento de Imagens</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Upload de Imagem</h2>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="uploadImage()">Carregar Imagem</button>
+    <br>
+    <img id="originalImage" src="" alt="Imagem Original" style="max-width: 400px; display: none;">
+    <h3>Processar Imagem</h3>
+    <button onclick="processImage('blur')">Aplicar Blur</button>
+    <button onclick="processImage('sharpen')">Aplicar Sharpening</button>
+    <button onclick="processImage('rotate')">Rotacionar 45°</button>
+    <button onclick ="Refresh('')"> Refresh pag</button> 
+    <br>
+    <h3>Imagem Processada</h3>
+    <img id="processedImage" src="" alt="Imagem Processada" style="max-width: 400px; display: none;">
+
+
+
+    
+    <script>
+        let uploadedImagePath = "";
+
+        function uploadImage() {
+            let fileInput = document.getElementById("imageInput");
+            let formData = new FormData();
+            formData.append(" ", fileInput.files[0]);
+
+            $.ajax({
+                url: "/upload",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    uploadedImagePath = response;
+                    $("#originalImage").attr("src", response).show();
+                },
+                error: function() {
+                    alert("Erro ao carregar imagem.");
+                }
+            });
+        }
+
+        function processImage(action) {
+            $.ajax({
+                url: "/process",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ image_path: uploadedImagePath, action: action }),
+                success: function(response) {
+                    $("#processedImage").attr("src", response).show();
+                }
+            });
+        }
+
+        function Refresh(){
+            window.location.reload();
+        }
+
+
+
+
+    </script>
+</body>
+</html>
